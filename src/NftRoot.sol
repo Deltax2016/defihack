@@ -1,4 +1,4 @@
-pragma ton-solidity = 0.47.0;
+pragma ton-solidity >= 0.47.0;
 
 pragma AbiHeader expire;
 pragma AbiHeader time;
@@ -19,6 +19,7 @@ contract NftRoot is NftResolver, IndexResolver {
     uint256 _ownerPubkey;
     uint256 _totalMinted;
     address _addrIndexBasis;
+    address _lastChild;
 
     /// _indexDeployValue will be spent on the Index deployment in the Nft contract
     uint128 _indexDeployValue = 0.4 ton;
@@ -47,10 +48,10 @@ contract NftRoot is NftResolver, IndexResolver {
         _ownerPubkey = ownerPubkey;
     }
 
-    function mintNft(string dataName) public {
+    function mintNft() public {
         require(msg.value >= (_indexDeployValue * 2) + _remainOnNft, NftRootErrors.value_less_than_required);
         tvm.rawReserve(msg.value, 1);
-
+        uint16 r1 = rnd.next(1000);
         TvmCell codeNft = _buildNftCode(address(this));
         TvmCell stateNft = _buildNftState(codeNft, _totalMinted);
         address nftAddr = new Nft{
@@ -60,12 +61,37 @@ contract NftRoot is NftResolver, IndexResolver {
                 msg.sender, 
                 _codeIndex,
                 _indexDeployValue,
-                dataName
+                r1
             ); 
 
         emit TokenWasMinted(nftAddr, msg.sender);
 
         _totalMinted++;
+
+        msg.sender.transfer({value: 0, flag: 128});
+    }
+
+    function mintNftChild(uint16 gen, address owner) public {
+        require(msg.value >= (_indexDeployValue * 2) + _remainOnNft, NftRootErrors.value_less_than_required);
+        tvm.rawReserve(msg.value, 1);
+        uint16 r1 = rnd.next(4);
+        gen += r1;
+        TvmCell codeNft = _buildNftCode(address(this));
+        TvmCell stateNft = _buildNftState(codeNft, _totalMinted);
+        address nftAddr = new Nft {
+            stateInit: stateNft,
+            value: (_indexDeployValue * 2) + _remainOnNft
+            }(
+                owner, 
+                _codeIndex,
+                _indexDeployValue,
+                gen
+            ); 
+
+        emit TokenWasMinted(nftAddr, msg.sender);
+
+        _totalMinted++;
+        _lastChild = nftAddr;
 
         msg.sender.transfer({value: 0, flag: 128});
     }

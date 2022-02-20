@@ -1,4 +1,4 @@
-pragma ton-solidity = 0.47.0;
+pragma ton-solidity >= 0.47.0;
 
 pragma AbiHeader expire;
 pragma AbiHeader pubkey;
@@ -8,10 +8,10 @@ import './IName.sol';
 
 abstract contract Name is IName {
 
-    string _dataName;
+    uint16 _data;
 
-    function getName() public override responsible returns (string dataName) {
-        return {value: 0, flag: 64}(_dataName);
+    function getName() public override responsible returns (uint16 data) {
+        return {value: 0, flag: 64}(_data);
     }
 
 }

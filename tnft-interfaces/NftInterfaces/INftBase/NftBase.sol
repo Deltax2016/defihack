@@ -1,4 +1,4 @@
-pragma ton-solidity = 0.47.0;
+pragma ton-solidity >= 0.47.0;
 
 pragma AbiHeader expire;
 pragma AbiHeader pubkey;
@@ -12,13 +12,20 @@ import './ITokenTransferCallback.sol';
 
 abstract contract NftBase is INftBase, IndexResolver {
 
-    uint256 static _id;
+    uint256 public static _id;
 
     address _addrRoot;
     address _addrOwner;
 
     uint128 _indexDeployValue;
     uint128 _indexDestroyValue;
+    uint128 _lastWatered;
+    uint128 public _lastHarvest;
+
+    uint128 public _birthTime = 0;
+    uint16 public _waters;
+
+    uint16 public _child = 0;
     
     event TokenWasMinted(address owner);
     event OwnershipTransferred(address oldOwner, address newOwner);
@@ -125,6 +132,7 @@ abstract contract NftBase is INftBase, IndexResolver {
     function getOwner() public responsible override returns(address addrOwner) {
         return {value: 0, flag: 64} _addrOwner;
     }
+
 
     modifier onlyOwner virtual {
         require(msg.sender == _addrOwner, NftErrors.sender_is_not_owner);

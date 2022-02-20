@@ -1,5 +1,6 @@
 {
 	"ABI version": 2,
+	"version": "2.2",
 	"header": ["pubkey", "time", "expire"],
 	"functions": [
 		{
@@ -15,6 +16,15 @@
 		{
 			"name": "mintNft",
 			"inputs": [
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "mintNftChild",
+			"inputs": [
+				{"name":"gen","type":"uint16"},
+				{"name":"owner","type":"address"}
 			],
 			"outputs": [
 			]
@@ -159,5 +169,19 @@
 			"outputs": [
 			]
 		}
+	],
+	"fields": [
+		{"name":"_pubkey","type":"uint256"},
+		{"name":"_timestamp","type":"uint64"},
+		{"name":"_constructorFlag","type":"bool"},
+		{"name":"_codeNft","type":"cell"},
+		{"name":"_codeIndex","type":"cell"},
+		{"name":"_ownerPubkey","type":"uint256"},
+		{"name":"_totalMinted","type":"uint256"},
+		{"name":"_addrIndexBasis","type":"address"},
+		{"name":"_lastChild","type":"address"},
+		{"name":"_indexDeployValue","type":"uint128"},
+		{"name":"_remainOnNft","type":"uint128"},
+		{"name":"_deployIndexBasisValue","type":"uint128"}
 	]
 }
